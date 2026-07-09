@@ -1,0 +1,29 @@
+{
+  "file_name": "P10",
+  "document_type": "permit",
+  "start_time": null,
+  "end_time": null,
+  "total_time_seconds": null,
+  "fields": [
+    {
+      "field_name": "setl",
+      "GT": "נתניה",
+      "normalized_GT": "נתניה"
+    },
+    {
+      "field_name": "gush",
+      "GT": "8568",
+      "normalized_GT": "8568"
+    },
+    {
+      "field_name": "parcel",
+      "GT": "20",
+      "normalized_GT": "20"
+    },
+    {
+      "field_name": "bld_num",
+      "GT": "8833",
+      "normalized_GT": "8833"
+    }
+  ]
+}

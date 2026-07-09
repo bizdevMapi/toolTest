@@ -1,0 +1,29 @@
+{
+  "file_name": "G1",
+  "document_type": "garmushka",
+  "start_time": null,
+  "end_time": null,
+  "total_time_seconds": null,
+  "fields": [
+    {
+      "field_name": "gush",
+      "GT": "6933",
+      "normalized_GT": "6933"
+    },
+    {
+      "field_name": "parcel",
+      "GT": "121",
+      "normalized_GT": "121"
+    },
+    {
+      "field_name": "bld_num",
+      "GT": "0004-075",
+      "normalized_GT": "0004_075"
+    },
+    {
+      "field_name": "primary_use",
+      "GT": null,
+      "normalized_GT": null
+    }
+  ]
+}

@@ -1,0 +1,29 @@
+{
+  "file_name": "T3",
+  "document_type": "tazar",
+  "start_time": "08:00:00",
+  "end_time": "08:01:30",
+  "total_time_seconds": 90,
+  "fields": [
+    {
+      "field_name": "setl",
+      "extracted_value": "נתניה",
+      "normalized_value": "נתניה"
+    },
+    {
+      "field_name": "gush",
+      "extracted_value": "7941",
+      "normalized_value": "7941"
+    },
+    {
+      "field_name": "parcel",
+      "extracted_value": "4, 2",
+      "normalized_value": "4, 2"
+    },
+    {
+      "field_name": "plan_id",
+      "extracted_value": "658/67",
+      "normalized_value": "658_67"
+    }
+  ]
+}

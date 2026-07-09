@@ -1,0 +1,29 @@
+{
+  "file_name": "P3",
+  "document_type": "permit",
+  "start_time": null,
+  "end_time": null,
+  "total_time_seconds": null,
+  "fields": [
+    {
+      "field_name": "setl",
+      "GT": "פתח תקווה",
+      "normalized_GT": "פתח תקווה"
+    },
+    {
+      "field_name": "gush",
+      "GT": "6378",
+      "normalized_GT": "6378"
+    },
+    {
+      "field_name": "parcel",
+      "GT": "157",
+      "normalized_GT": "157"
+    },
+    {
+      "field_name": "bld_num",
+      "GT": "1643",
+      "normalized_GT": "1643"
+    }
+  ]
+}

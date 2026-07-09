@@ -1,0 +1,29 @@
+{
+  "file_name": "P7",
+  "document_type": "permit",
+  "start_time": null,
+  "end_time": null,
+  "total_time_seconds": null,
+  "fields": [
+    {
+      "field_name": "setl",
+      "GT": "תל אביב-יפו",
+      "normalized_GT": "תל אביב-יפו"
+    },
+    {
+      "field_name": "gush",
+      "GT": "6615",
+      "normalized_GT": "6615"
+    },
+    {
+      "field_name": "parcel",
+      "GT": "19",
+      "normalized_GT": "19"
+    },
+    {
+      "field_name": "bld_num",
+      "GT": "9780570",
+      "normalized_GT": "9780570"
+    }
+  ]
+}

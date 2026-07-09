@@ -1,0 +1,29 @@
+{
+  "file_name": "T4",
+  "document_type": "tazar",
+  "start_time": "08:00:00",
+  "end_time": "08:01:30",
+  "total_time_seconds": 90,
+  "fields": [
+    {
+      "field_name": "setl",
+      "extracted_value": "אשקלון",
+      "normalized_value": "אשקלון"
+    },
+    {
+      "field_name": "gush",
+      "extracted_value": "1997",
+      "normalized_value": "1997"
+    },
+    {
+      "field_name": "parcel",
+      "extracted_value": "54, 44, 42, 41, 18, 9, 7, 6",
+      "normalized_value": "54, 44, 42, 41, 18, 9, 7, 6"
+    },
+    {
+      "field_name": "plan_id",
+      "extracted_value": "606/76",
+      "normalized_value": "606_76"
+    }
+  ]
+}

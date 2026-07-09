@@ -1,0 +1,242 @@
+[
+  {
+    "file_name": "T1",
+    "document_type": "tazar",
+    "field_name": "setl",
+    "expected_value": "לוד"
+  },
+  {
+    "file_name": "T1",
+    "document_type": "tazar",
+    "field_name": "gush",
+    "expected_value": "5382"
+  },
+  {
+    "file_name": "T1",
+    "document_type": "tazar",
+    "field_name": "parcel",
+    "expected_value": "[2], 24, 23, 22, 21, 20, 4, 3, 2, 1"
+  },
+  {
+    "file_name": "T1",
+    "document_type": "tazar",
+    "field_name": "plan_id",
+    "expected_value": "1735_2022"
+  },
+  {
+    "file_name": "T10",
+    "document_type": "tazar",
+    "field_name": "setl",
+    "expected_value": "ירושלים"
+  },
+  {
+    "file_name": "T10",
+    "document_type": "tazar",
+    "field_name": "gush",
+    "expected_value": "30184"
+  },
+  {
+    "file_name": "T10",
+    "document_type": "tazar",
+    "field_name": "parcel",
+    "expected_value": "85, 79-74"
+  },
+  {
+    "file_name": "T10",
+    "document_type": "tazar",
+    "field_name": "plan_id",
+    "expected_value": "14_77"
+  },
+  {
+    "file_name": "T2",
+    "document_type": "tazar",
+    "field_name": "setl",
+    "expected_value": "באר שבע"
+  },
+  {
+    "file_name": "T2",
+    "document_type": "tazar",
+    "field_name": "gush",
+    "expected_value": "38246"
+  },
+  {
+    "file_name": "T2",
+    "document_type": "tazar",
+    "field_name": "parcel",
+    "expected_value": "49, 50 ,52 ,66 ,67"
+  },
+  {
+    "file_name": "T2",
+    "document_type": "tazar",
+    "field_name": "plan_id",
+    "expected_value": "730_2014"
+  },
+  {
+    "file_name": "T3",
+    "document_type": "tazar",
+    "field_name": "setl",
+    "expected_value": "נתניה"
+  },
+  {
+    "file_name": "T3",
+    "document_type": "tazar",
+    "field_name": "gush",
+    "expected_value": "7941"
+  },
+  {
+    "file_name": "T3",
+    "document_type": "tazar",
+    "field_name": "parcel",
+    "expected_value": "4, 2"
+  },
+  {
+    "file_name": "T3",
+    "document_type": "tazar",
+    "field_name": "plan_id",
+    "expected_value": "658_67"
+  },
+  {
+    "file_name": "T4",
+    "document_type": "tazar",
+    "field_name": "setl",
+    "expected_value": "אשקלון"
+  },
+  {
+    "file_name": "T4",
+    "document_type": "tazar",
+    "field_name": "gush",
+    "expected_value": "1997"
+  },
+  {
+    "file_name": "T4",
+    "document_type": "tazar",
+    "field_name": "parcel",
+    "expected_value": "54, 44, 42, 41, 18, 9, 7, 6"
+  },
+  {
+    "file_name": "T4",
+    "document_type": "tazar",
+    "field_name": "plan_id",
+    "expected_value": "606_76"
+  },
+  {
+    "file_name": "T5",
+    "document_type": "tazar",
+    "field_name": "setl",
+    "expected_value": "חממה"
+  },
+  {
+    "file_name": "T5",
+    "document_type": "tazar",
+    "field_name": "gush",
+    "expected_value": "375"
+  },
+  {
+    "file_name": "T5",
+    "document_type": "tazar",
+    "field_name": "parcel",
+    "expected_value": "45-1"
+  },
+  {
+    "file_name": "T5",
+    "document_type": "tazar",
+    "field_name": "plan_id",
+    "expected_value": "521_72"
+  },
+  {
+    "file_name": "T6",
+    "document_type": "tazar",
+    "field_name": "setl",
+    "expected_value": "ירושלים"
+  },
+  {
+    "file_name": "T6",
+    "document_type": "tazar",
+    "field_name": "gush",
+    "expected_value": "30076"
+  },
+  {
+    "file_name": "T6",
+    "document_type": "tazar",
+    "field_name": "parcel",
+    "expected_value": "143, 141-138, 128, 23, 1"
+  },
+  {
+    "file_name": "T6",
+    "document_type": "tazar",
+    "field_name": "plan_id",
+    "expected_value": "283_76"
+  },
+  {
+    "file_name": "T7",
+    "document_type": "tazar",
+    "field_name": "setl",
+    "expected_value": "תל אביב-יפו"
+  },
+  {
+    "file_name": "T7",
+    "document_type": "tazar",
+    "field_name": "gush",
+    "expected_value": "7071"
+  },
+  {
+    "file_name": "T7",
+    "document_type": "tazar",
+    "field_name": "parcel",
+    "expected_value": "102, 94"
+  },
+  {
+    "file_name": "T7",
+    "document_type": "tazar",
+    "field_name": "plan_id",
+    "expected_value": "150_64"
+  },
+  {
+    "file_name": "T8",
+    "document_type": "tazar",
+    "field_name": "setl",
+    "expected_value": "נתניה"
+  },
+  {
+    "file_name": "T8",
+    "document_type": "tazar",
+    "field_name": "gush",
+    "expected_value": "8267"
+  },
+  {
+    "file_name": "T8",
+    "document_type": "tazar",
+    "field_name": "parcel",
+    "expected_value": "11, 657-661, 670, 672"
+  },
+  {
+    "file_name": "T8",
+    "document_type": "tazar",
+    "field_name": "plan_id",
+    "expected_value": "99_60"
+  },
+  {
+    "file_name": "T9",
+    "document_type": "tazar",
+    "field_name": "setl",
+    "expected_value": "תל אביב-יפו"
+  },
+  {
+    "file_name": "T9",
+    "document_type": "tazar",
+    "field_name": "gush",
+    "expected_value": "7081"
+  },
+  {
+    "file_name": "T9",
+    "document_type": "tazar",
+    "field_name": "parcel",
+    "expected_value": "57, 58, 59"
+  },
+  {
+    "file_name": "T9",
+    "document_type": "tazar",
+    "field_name": "plan_id",
+    "expected_value": "84_73"
+  }
+]

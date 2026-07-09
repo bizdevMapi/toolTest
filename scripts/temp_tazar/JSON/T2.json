@@ -1,0 +1,29 @@
+{
+  "file_name": "T2",
+  "document_type": "tazar",
+  "start_time": "08:00:00",
+  "end_time": "08:01:30",
+  "total_time_seconds": 90,
+  "fields": [
+    {
+      "field_name": "setl",
+      "extracted_value": "באר שבע",
+      "normalized_value": "באר שבע"
+    },
+    {
+      "field_name": "gush",
+      "extracted_value": "38246",
+      "normalized_value": "38246"
+    },
+    {
+      "field_name": "parcel",
+      "extracted_value": "49, 50 ,52 ,66 ,67",
+      "normalized_value": "49, 50 ,52 ,66 ,67"
+    },
+    {
+      "field_name": "plan_id",
+      "extracted_value": "730/2014",
+      "normalized_value": "730_2014"
+    }
+  ]
+}

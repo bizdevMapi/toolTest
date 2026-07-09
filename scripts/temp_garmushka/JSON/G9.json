@@ -1,0 +1,29 @@
+{
+  "file_name": "G9",
+  "document_type": "garmushka",
+  "start_time": null,
+  "end_time": null,
+  "total_time_seconds": null,
+  "fields": [
+    {
+      "field_name": "gush",
+      "GT": "8323",
+      "normalized_GT": "8323"
+    },
+    {
+      "field_name": "parcel",
+      "GT": "115",
+      "normalized_GT": "115"
+    },
+    {
+      "field_name": "bld_num",
+      "GT": "2124",
+      "normalized_GT": "2124"
+    },
+    {
+      "field_name": "primary_use",
+      "GT": "מגורים",
+      "normalized_GT": "מגורים"
+    }
+  ]
+}

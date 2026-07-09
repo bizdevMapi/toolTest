@@ -1,0 +1,29 @@
+{
+  "file_name": "T9",
+  "document_type": "tazar",
+  "start_time": "08:00:00",
+  "end_time": "08:01:30",
+  "total_time_seconds": 90,
+  "fields": [
+    {
+      "field_name": "setl",
+      "extracted_value": "תל אביב-יפו",
+      "normalized_value": "תל אביב-יפו"
+    },
+    {
+      "field_name": "gush",
+      "extracted_value": "7081",
+      "normalized_value": "7081"
+    },
+    {
+      "field_name": "parcel",
+      "extracted_value": "57, 58, 59",
+      "normalized_value": "57, 58, 59"
+    },
+    {
+      "field_name": "plan_id",
+      "extracted_value": "84/73",
+      "normalized_value": "84_73"
+    }
+  ]
+}

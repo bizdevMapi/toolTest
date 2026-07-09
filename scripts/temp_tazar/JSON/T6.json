@@ -1,0 +1,29 @@
+{
+  "file_name": "T6",
+  "document_type": "tazar",
+  "start_time": "08:00:00",
+  "end_time": "08:01:30",
+  "total_time_seconds": 90,
+  "fields": [
+    {
+      "field_name": "setl",
+      "extracted_value": "ירושלים",
+      "normalized_value": "ירושלים"
+    },
+    {
+      "field_name": "gush",
+      "extracted_value": "30076",
+      "normalized_value": "30076"
+    },
+    {
+      "field_name": "parcel",
+      "extracted_value": "143, 141-138, 128, 23, 1",
+      "normalized_value": "143, 141-138, 128, 23, 1"
+    },
+    {
+      "field_name": "plan_id",
+      "extracted_value": "283/76",
+      "normalized_value": "283_76"
+    }
+  ]
+}

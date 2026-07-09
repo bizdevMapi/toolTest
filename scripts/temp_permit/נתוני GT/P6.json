@@ -1,0 +1,29 @@
+{
+  "file_name": "P6",
+  "document_type": "permit",
+  "start_time": null,
+  "end_time": null,
+  "total_time_seconds": null,
+  "fields": [
+    {
+      "field_name": "setl",
+      "GT": "ירושלים",
+      "normalized_GT": "ירושלים"
+    },
+    {
+      "field_name": "gush",
+      "GT": "30591",
+      "normalized_GT": "30591"
+    },
+    {
+      "field_name": "parcel",
+      "GT": "1",
+      "normalized_GT": "1"
+    },
+    {
+      "field_name": "bld_num",
+      "GT": "03/255.1",
+      "normalized_GT": "03_255.1"
+    }
+  ]
+}

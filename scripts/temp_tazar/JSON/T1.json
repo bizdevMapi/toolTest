@@ -1,0 +1,29 @@
+{
+  "file_name": "T1",
+  "document_type": "tazar",
+  "start_time": "08:00:00",
+  "end_time": "08:01:30",
+  "total_time_seconds": 90,
+  "fields": [
+    {
+      "field_name": "setl",
+      "extracted_value": "לוד",
+      "normalized_value": "לוד"
+    },
+    {
+      "field_name": "gush",
+      "extracted_value": "5382",
+      "normalized_value": "5382"
+    },
+    {
+      "field_name": "parcel",
+      "extracted_value": "[2], 24, 23, 22, 21, 20, 4, 3, 2, 1",
+      "normalized_value": "[2], 24, 23, 22, 21, 20, 4, 3, 2, 1"
+    },
+    {
+      "field_name": "plan_id",
+      "extracted_value": "1735/2022",
+      "normalized_value": "1735_2022"
+    }
+  ]
+}

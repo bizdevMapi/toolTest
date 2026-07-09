@@ -1,0 +1,18 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(cp backend/.env.example backend/.env && echo \"✅ קובץ .env נוצר בהצלחה\" && cat backend/.env)",
+      "Bash(npm install *)",
+      "Bash(npm run *)",
+      "Bash(curl -s http://localhost:5000/api/health)",
+      "Bash(npm start *)",
+      "Bash(PORT=3001 npm start)",
+      "Read(//c/Users/user01.HP61-LAP/**)",
+      "Bash(curl -X POST http://localhost:5000/api/gt/upload -H \"Content-Type: application/json\" -d @sample-data/ground-truth.json)",
+      "Bash(cat C:\\\\\\\\Users\\\\\\\\USER01~1.HP6\\\\\\\\AppData\\\\\\\\Local\\\\\\\\Temp\\\\\\\\claude\\\\\\\\c--Users-user01-HP61-LAP-vendor-evaluation-system\\\\\\\\ef6b476b-a4b6-4eb0-a43e-9335aebe48ff\\\\\\\\tasks\\\\\\\\bz6pfbx22.output)"
+    ],
+    "additionalDirectories": [
+      "C:\\Users\\user01.HP61-LAP\\vendor-evaluation-system\\backend\\backend"
+    ]
+  }
+}

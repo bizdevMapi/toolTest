@@ -1,0 +1,242 @@
+[
+  {
+    "file_name": "P1",
+    "document_type": "permit",
+    "field_name": "setl",
+    "expected_value": "תל אביב-יפו"
+  },
+  {
+    "file_name": "P1",
+    "document_type": "permit",
+    "field_name": "gush",
+    "expected_value": "6933"
+  },
+  {
+    "file_name": "P1",
+    "document_type": "permit",
+    "field_name": "parcel",
+    "expected_value": "121"
+  },
+  {
+    "file_name": "P1",
+    "document_type": "permit",
+    "field_name": "bld_num",
+    "expected_value": "0004_075"
+  },
+  {
+    "file_name": "P10",
+    "document_type": "permit",
+    "field_name": "setl",
+    "expected_value": "נתניה"
+  },
+  {
+    "file_name": "P10",
+    "document_type": "permit",
+    "field_name": "gush",
+    "expected_value": "8568"
+  },
+  {
+    "file_name": "P10",
+    "document_type": "permit",
+    "field_name": "parcel",
+    "expected_value": "20"
+  },
+  {
+    "file_name": "P10",
+    "document_type": "permit",
+    "field_name": "bld_num",
+    "expected_value": "8833"
+  },
+  {
+    "file_name": "P2",
+    "document_type": "permit",
+    "field_name": "setl",
+    "expected_value": "ירושלים"
+  },
+  {
+    "file_name": "P2",
+    "document_type": "permit",
+    "field_name": "gush",
+    "expected_value": "30909"
+  },
+  {
+    "file_name": "P2",
+    "document_type": "permit",
+    "field_name": "parcel",
+    "expected_value": "6"
+  },
+  {
+    "file_name": "P2",
+    "document_type": "permit",
+    "field_name": "bld_num",
+    "expected_value": "2017_748.01"
+  },
+  {
+    "file_name": "P3",
+    "document_type": "permit",
+    "field_name": "setl",
+    "expected_value": "פתח תקווה"
+  },
+  {
+    "file_name": "P3",
+    "document_type": "permit",
+    "field_name": "gush",
+    "expected_value": "6378"
+  },
+  {
+    "file_name": "P3",
+    "document_type": "permit",
+    "field_name": "parcel",
+    "expected_value": "157"
+  },
+  {
+    "file_name": "P3",
+    "document_type": "permit",
+    "field_name": "bld_num",
+    "expected_value": "1643"
+  },
+  {
+    "file_name": "P4",
+    "document_type": "permit",
+    "field_name": "setl",
+    "expected_value": "ירושלים"
+  },
+  {
+    "file_name": "P4",
+    "document_type": "permit",
+    "field_name": "gush",
+    "expected_value": "30501"
+  },
+  {
+    "file_name": "P4",
+    "document_type": "permit",
+    "field_name": "parcel",
+    "expected_value": "8"
+  },
+  {
+    "file_name": "P4",
+    "document_type": "permit",
+    "field_name": "bld_num",
+    "expected_value": "98_795"
+  },
+  {
+    "file_name": "P5",
+    "document_type": "permit",
+    "field_name": "setl",
+    "expected_value": "ירושלים"
+  },
+  {
+    "file_name": "P5",
+    "document_type": "permit",
+    "field_name": "gush",
+    "expected_value": "30076"
+  },
+  {
+    "file_name": "P5",
+    "document_type": "permit",
+    "field_name": "parcel",
+    "expected_value": "181"
+  },
+  {
+    "file_name": "P5",
+    "document_type": "permit",
+    "field_name": "bld_num",
+    "expected_value": "99_523.01"
+  },
+  {
+    "file_name": "P6",
+    "document_type": "permit",
+    "field_name": "setl",
+    "expected_value": "ירושלים"
+  },
+  {
+    "file_name": "P6",
+    "document_type": "permit",
+    "field_name": "gush",
+    "expected_value": "30591"
+  },
+  {
+    "file_name": "P6",
+    "document_type": "permit",
+    "field_name": "parcel",
+    "expected_value": "1"
+  },
+  {
+    "file_name": "P6",
+    "document_type": "permit",
+    "field_name": "bld_num",
+    "expected_value": "03_255.1"
+  },
+  {
+    "file_name": "P7",
+    "document_type": "permit",
+    "field_name": "setl",
+    "expected_value": "תל אביב-יפו"
+  },
+  {
+    "file_name": "P7",
+    "document_type": "permit",
+    "field_name": "gush",
+    "expected_value": "6615"
+  },
+  {
+    "file_name": "P7",
+    "document_type": "permit",
+    "field_name": "parcel",
+    "expected_value": "19"
+  },
+  {
+    "file_name": "P7",
+    "document_type": "permit",
+    "field_name": "bld_num",
+    "expected_value": "9780570"
+  },
+  {
+    "file_name": "P8",
+    "document_type": "permit",
+    "field_name": "setl",
+    "expected_value": "תל אביב-יפו"
+  },
+  {
+    "file_name": "P8",
+    "document_type": "permit",
+    "field_name": "gush",
+    "expected_value": "6217"
+  },
+  {
+    "file_name": "P8",
+    "document_type": "permit",
+    "field_name": "parcel",
+    "expected_value": "188"
+  },
+  {
+    "file_name": "P8",
+    "document_type": "permit",
+    "field_name": "bld_num",
+    "expected_value": "6750080"
+  },
+  {
+    "file_name": "P9",
+    "document_type": "permit",
+    "field_name": "setl",
+    "expected_value": "נתניה"
+  },
+  {
+    "file_name": "P9",
+    "document_type": "permit",
+    "field_name": "gush",
+    "expected_value": "8323"
+  },
+  {
+    "file_name": "P9",
+    "document_type": "permit",
+    "field_name": "parcel",
+    "expected_value": "115"
+  },
+  {
+    "file_name": "P9",
+    "document_type": "permit",
+    "field_name": "bld_num",
+    "expected_value": "2124"
+  }
+]
