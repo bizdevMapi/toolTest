@@ -511,20 +511,34 @@ exports.uploadVendorZip = async (req, res) => {
             }
 
             // Validate time calculation
+            let hasTimeCalculationError = false;
             if (submission.start_time && submission.end_time && submission.total_time_seconds !== null) {
               const startSeconds = timeToSeconds(submission.start_time);
               const endSeconds = timeToSeconds(submission.end_time);
               const calculatedDiff = endSeconds - startSeconds;
 
               if (calculatedDiff !== submission.total_time_seconds) {
-                return res.status(400).json({
-                  success: false,
-                  message: `Time calculation error in file ${submission.file_name}: start_time=${submission.start_time}, end_time=${submission.end_time}, reported total_time_seconds=${submission.total_time_seconds}, but should be ${calculatedDiff} seconds`
-                });
+                console.log(`⏱️ Time calculation error in file ${submission.file_name}: start_time=${submission.start_time}, end_time=${submission.end_time}, reported total_time_seconds=${submission.total_time_seconds}, but should be ${calculatedDiff} seconds`);
+                hasTimeCalculationError = true;
               }
             }
 
             const timeSeconds = submission.total_time_seconds || 2.5;
+
+            // If time calculation is wrong, give score 0 for ALL fields in this file
+            if (hasTimeCalculationError) {
+              console.log(`❌ Giving score 0 to all fields in file ${submission.file_name} due to time calculation error`);
+
+              const expectedFields = getCanonicalFieldNames(submission.document_type);
+              for (const fieldName of expectedFields) {
+                const canonicalFieldName = fieldName.toLowerCase();
+                if (fieldScores[canonicalFieldName]) {
+                  fieldScores[canonicalFieldName].push(0);
+                }
+              }
+
+              continue; // Skip to next file
+            }
 
             // Process each field
             for (const field of submission.fields) {
