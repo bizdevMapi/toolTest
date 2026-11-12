@@ -28,6 +28,6 @@ const groundTruthSchema = new mongoose.Schema({
 
 groundTruthSchema.index({ file_name: 1, document_type: 1, field_name: 1 }, { unique: true });
 
-const GroundTruth = mongoose.model('GroundTruth', groundTruthSchema);
+const GroundTruth = mongoose.model('groundtruths', groundTruthSchema, 'groundtruths');
 
 module.exports = GroundTruth;

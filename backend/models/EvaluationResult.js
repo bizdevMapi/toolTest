@@ -60,6 +60,6 @@ const evaluationResultSchema = new mongoose.Schema({
 
 evaluationResultSchema.index({ total_score: -1 });
 
-const EvaluationResult = mongoose.model('EvaluationResult', evaluationResultSchema);
+const EvaluationResult = mongoose.model('evaluationresults', evaluationResultSchema, 'evaluationresults');
 
 module.exports = EvaluationResult;

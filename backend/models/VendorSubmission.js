@@ -50,6 +50,6 @@ const vendorSubmissionSchema = new mongoose.Schema({
 vendorSubmissionSchema.index({ vendor_name: 1, document_type: 1 });
 vendorSubmissionSchema.index({ vendor_name: 1, file_name: 1, field_name: 1 });
 
-const VendorSubmission = mongoose.model('VendorSubmission', vendorSubmissionSchema);
+const VendorSubmission = mongoose.model('vendorsubmissions', vendorSubmissionSchema, 'vendorsubmissions');
 
 module.exports = VendorSubmission;
