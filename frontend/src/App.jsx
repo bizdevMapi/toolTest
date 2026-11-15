@@ -4,6 +4,7 @@ import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import VendorUpload from './components/VendorUpload';
 import ResultsTable from './components/ResultsTable';
+import IntermediateTables from './components/IntermediateTables';
 
 function Navigation() {
   const location = useLocation();
@@ -21,6 +22,16 @@ function Navigation() {
             }`}
           >
             📤 העלאת תוצאות
+          </Link>
+          <Link
+            to="/intermediate-tables"
+            className={`px-6 py-2 rounded-md font-semibold transition-colors ${
+              location.pathname === '/intermediate-tables'
+                ? 'bg-primary-600 text-white'
+                : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+            }`}
+          >
+            📋 טבלאות ביניים
           </Link>
           <Link
             to="/results"
@@ -67,6 +78,7 @@ function App() {
         <main className="container mx-auto px-4 py-8 max-w-6xl flex-grow">
           <Routes>
             <Route path="/" element={<VendorUpload />} />
+            <Route path="/intermediate-tables" element={<IntermediateTables />} />
             <Route path="/results" element={<ResultsTable />} />
           </Routes>
         </main>

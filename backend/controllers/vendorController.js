@@ -19,6 +19,61 @@ function timeToSeconds(timeStr) {
 }
 
 /**
+ * Calculate component score using quadratic formula
+ * ציוני = W × ((Aᵢ - T) / (E - T))²
+ *
+ * @param {number} accuracy - Vendor accuracy (0-100)
+ * @param {number} weight - Component weight (5, 20, etc)
+ * @param {number} maxAccuracy - Maximum accuracy found across all vendors for this doc type
+ * @param {number} threshold - Minimum threshold (default 80)
+ * @returns {number} Calculated score
+ */
+function calculateComponentScore(accuracy, weight, maxAccuracy, threshold = 80) {
+  // If accuracy is below threshold, return 0
+  if (accuracy < threshold) {
+    return 0;
+  }
+
+  // If max accuracy equals threshold, avoid division issues
+  if (maxAccuracy === threshold) {
+    return weight; // Full points if at threshold
+  }
+
+  // Apply quadratic formula: W × ((A - T) / (E - T))²
+  const quadraticScore = Math.pow((accuracy - threshold) / (maxAccuracy - threshold), 2);
+  return weight * quadraticScore;
+}
+
+/**
+ * Calculate time score for a vendor
+ * ציון זמן = MAX(0, 5 - FLOOR((זמן_ספק - זמן_מינימלי) / 4))
+ *
+ * @param {number} vendorTime - Vendor's time in seconds
+ * @param {number} minTime - Minimum time across all vendors for this doc type
+ * @returns {number} Time score (0-5 points) or 0 if no time data
+ */
+function calculateTimeScore(vendorTime, minTime) {
+  const MAX_TIME_POINTS = 5;
+  const TIME_INCREMENT = 4; // Each 4 seconds loses 1 point
+
+  // If vendor time is 0 or missing, they didn't submit - no time score
+  if (!vendorTime || vendorTime === 0 || !minTime || minTime === 0) {
+    return 0;
+  }
+
+  // Time difference from minimum
+  const timeDiff = vendorTime - minTime;
+
+  // Calculate points lost
+  const pointsLost = Math.floor(timeDiff / TIME_INCREMENT);
+
+  // Final score (minimum 0)
+  const timeScore = Math.max(0, MAX_TIME_POINTS - pointsLost);
+
+  return timeScore;
+}
+
+/**
  * Upload Vendor Submission
  * POST /api/vendor/upload
  */
@@ -365,6 +420,197 @@ exports.getEvaluationResults = async (req, res) => {
 };
 
 /**
+ * Get Intermediate Tables with Calculated Scores
+ * GET /api/vendor/intermediate-tables
+ *
+ * Returns 4 tables (one per document type) with:
+ * - vendor_name
+ * - accuracy_score (accuracy for that document type %)
+ * - weighted_score (calculated using quadratic formula)
+ * - median_time (median time for that document type)
+ *
+ * Formula: W × ((A - T) / (E - T))²
+ * W = weight, A = accuracy, T = threshold (80%), E = max accuracy
+ */
+exports.getIntermediateTables = async (req, res) => {
+  try {
+    const results = await EvaluationResult.find().sort({ vendor_name: 1 });
+
+    console.log(`\n📋 getIntermediateTables called`);
+    console.log(`Total evaluation results found: ${results.length}`);
+
+    if (results.length === 0) {
+      console.log(`❌ No evaluation results found in DB`);
+      return res.status(400).json({
+        success: false,
+        message: 'No evaluation results found'
+      });
+    }
+
+    const documentTypes = ['permit', 'garmushka', 'tazar', 'mavat'];
+    const accuracyWeights = {
+      permit: 5,
+      garmushka: 5,
+      tazar: 20,
+      mavat: 20
+    };
+
+    const intermediateData = {};
+
+    // Initialize tables for each document type
+    for (const docType of documentTypes) {
+      intermediateData[docType] = [];
+    }
+
+    // STEP 1: Collect all accuracy scores by document type
+    const accuraciesByDocType = {};
+    for (const docType of documentTypes) {
+      accuraciesByDocType[docType] = [];
+    }
+
+    for (const result of results) {
+      for (const docScore of result.document_type_scores) {
+        const docType = docScore.document_type;
+        accuraciesByDocType[docType].push(docScore.accuracy_score);
+      }
+    }
+
+    // STEP 2: Find max accuracy and min time for each document type
+    const maxAccuraciesByDocType = {};
+    const minTimesByDocType = {};
+
+    for (const docType of documentTypes) {
+      if (accuraciesByDocType[docType].length > 0) {
+        maxAccuraciesByDocType[docType] = Math.max(...accuraciesByDocType[docType]);
+      } else {
+        maxAccuraciesByDocType[docType] = 100; // Default if no data
+      }
+
+      // Find minimum time for this document type
+      const times = [];
+      for (const result of results) {
+        const docScore = result.document_type_scores.find(s => s.document_type === docType);
+        if (docScore && docScore.median_time > 0) {
+          times.push(docScore.median_time);
+        }
+      }
+      minTimesByDocType[docType] = times.length > 0 ? Math.min(...times) : 0;
+    }
+
+    console.log(`\n📊 Maximum accuracies by document type:`);
+    for (const docType of documentTypes) {
+      console.log(`   ${docType.toUpperCase()}: ${maxAccuraciesByDocType[docType].toFixed(2)}%`);
+    }
+
+    console.log(`\n⏱️ Minimum times by document type:`);
+    for (const docType of documentTypes) {
+      console.log(`   ${docType.toUpperCase()}: ${minTimesByDocType[docType].toFixed(2)}s`);
+    }
+
+    // STEP 3: Calculate weighted scores and time scores for each vendor and document type
+    for (const result of results) {
+      console.log(`\n📦 Processing vendor: ${result.vendor_name}`);
+
+      for (const docScore of result.document_type_scores) {
+        const docType = docScore.document_type;
+        const accuracy = docScore.accuracy_score;
+        const medianTime = docScore.median_time;
+        const weight = accuracyWeights[docType];
+        const maxAccuracy = maxAccuraciesByDocType[docType];
+        const minTime = minTimesByDocType[docType];
+
+        // Calculate weighted accuracy score using quadratic formula
+        const weightedScore = calculateComponentScore(accuracy, weight, maxAccuracy);
+
+        // Calculate time score
+        const timeScore = calculateTimeScore(medianTime, minTime);
+
+        // Add to intermediate table
+        const tableRow = {
+          vendor_name: result.vendor_name,
+          accuracy_score: parseFloat(accuracy.toFixed(2)),
+          weighted_score: parseFloat(weightedScore.toFixed(2)),
+          median_time: medianTime,
+          min_time: minTime,
+          time_score: parseFloat(timeScore.toFixed(2)),
+          weight: weight,
+          threshold: 80
+        };
+
+        console.log(`   ├─ ${docType.toUpperCase()}: accuracy=${accuracy.toFixed(2)}% (→${weightedScore.toFixed(2)}) | time=${medianTime}s (→${timeScore.toFixed(2)})`);
+        intermediateData[docType].push(tableRow);
+      }
+    }
+
+    // Sort each table by weighted score descending, then by vendor name
+    for (const docType of documentTypes) {
+      intermediateData[docType].sort((a, b) => {
+        if (b.weighted_score !== a.weighted_score) {
+          return b.weighted_score - a.weighted_score;
+        }
+        return a.vendor_name.localeCompare(b.vendor_name);
+      });
+    }
+
+    // Log the tables for debugging
+    console.log('\n' + '='.repeat(100));
+    console.log('📊 INTERMEDIATE TABLES WITH WEIGHTED SCORES - QUADRATIC FORMULA');
+    console.log('='.repeat(100));
+
+    for (const docType of documentTypes) {
+      console.log(`\n📄 ${docType.toUpperCase()} (weight=${accuracyWeights[docType]}, threshold=80%, max=${maxAccuraciesByDocType[docType].toFixed(2)}%)`);
+      console.log('-'.repeat(100));
+      console.log(
+        'Vendor Name'.padEnd(25) +
+        'Accuracy (%)'.padEnd(15) +
+        'Weighted Score'.padEnd(18) +
+        'Formula'.padEnd(35) +
+        'Time (s)'
+      );
+      console.log('-'.repeat(100));
+
+      for (const row of intermediateData[docType]) {
+        let formula = '';
+        if (row.accuracy_score < 80) {
+          formula = '< 80% → 0';
+        } else {
+          const maxAcc = maxAccuraciesByDocType[docType];
+          formula = `${row.weight}×((${row.accuracy_score}-80)/(${maxAcc.toFixed(2)}-80))²`;
+        }
+
+        console.log(
+          row.vendor_name.padEnd(25) +
+          row.accuracy_score.toString().padEnd(15) +
+          row.weighted_score.toString().padEnd(18) +
+          formula.padEnd(35) +
+          row.median_time.toString()
+        );
+      }
+
+      if (intermediateData[docType].length === 0) {
+        console.log('(אין נתונים)');
+      }
+    }
+    console.log('='.repeat(100) + '\n');
+
+    res.status(200).json({
+      success: true,
+      message: 'Intermediate tables with weighted scores generated successfully',
+      data: intermediateData,
+      maxAccuracies: maxAccuraciesByDocType
+    });
+
+  } catch (error) {
+    console.error('Error generating intermediate tables:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Error generating intermediate tables',
+      error: error.message
+    });
+  }
+};
+
+/**
  * Delete all vendor submissions and results
  * DELETE /api/vendor/all
  */
@@ -480,8 +726,17 @@ exports.uploadVendorZip = async (req, res) => {
       });
     }
 
+    // Get time_seconds from request body
+    const timeSeconds = req.body.time_seconds ? parseInt(req.body.time_seconds, 10) : null;
+    if (timeSeconds !== null && (isNaN(timeSeconds) || timeSeconds < 0)) {
+      return res.status(400).json({
+        success: false,
+        message: 'time_seconds must be a non-negative number (in seconds)'
+      });
+    }
+
     const vendorNameTrimmed = vendorName.trim();
-    console.log('2222222', vendorNameTrimmed, 'document_type:', documentType)
+    console.log('2222222', vendorNameTrimmed, 'document_type:', documentType, 'time_seconds:', timeSeconds)
     const zip = new AdmZip(req.file.buffer);
     const zipEntries = zip.getEntries();
 
@@ -560,7 +815,13 @@ exports.uploadVendorZip = async (req, res) => {
               }
             }
 
-            const timeSeconds = submission.total_time_seconds || 2.5;
+            // Use time_seconds from request body if provided, otherwise use from file
+            const fileTimeSeconds = submission.total_time_seconds || 2.5;
+            const usedTimeSeconds = timeSeconds !== null ? timeSeconds : fileTimeSeconds;
+
+            if (timeSeconds !== null) {
+              console.log(`⏰ Using time_seconds from UI input: ${usedTimeSeconds}s (instead of file value: ${fileTimeSeconds}s)`);
+            }
 
             // If time calculation is wrong, give score 0 for ALL fields in this file
             if (hasTimeCalculationError) {
@@ -869,10 +1130,28 @@ async function recalculateRankings(vendorNameToUpdate) {
     console.log(`Total vendors in system: ${results.length}`);
     console.log(`Vendors being updated: ${vendorsToUpdate.length}\n`);
 
+    // STEP 1: Calculate max accuracy for each document type across ALL vendors
+    const maxAccuraciesByDocType = {};
+    for (const docType of documentTypes) {
+      let maxAccuracy = 0;
+      for (const result of results) {
+        const docScore = result.document_type_scores.find(s => s.document_type === docType);
+        if (docScore && docScore.accuracy_score > maxAccuracy) {
+          maxAccuracy = docScore.accuracy_score;
+        }
+      }
+      maxAccuraciesByDocType[docType] = maxAccuracy > 0 ? maxAccuracy : 100;
+    }
+
+    console.log(`📊 Maximum accuracies by document type:`);
+    for (const docType of documentTypes) {
+      console.log(`   ${docType.toUpperCase()}: ${maxAccuraciesByDocType[docType].toFixed(2)}%`);
+    }
+
     for (const result of vendorsToUpdate) {
-      console.log(`\n${'='.repeat(60)}`);
+      console.log(`\n${'='.repeat(80)}`);
       console.log(`📊 RECALCULATING SCORES FOR VENDOR: ${result.vendor_name}`);
-      console.log(`${'='.repeat(60)}`);
+      console.log(`${'='.repeat(80)}`);
       console.log(`Document types received so far: ${result.document_type_scores.map(s => s.document_type).join(', ')}`);
 
       // Only calculate with document types that have been submitted
@@ -895,42 +1174,42 @@ async function recalculateRankings(vendorNameToUpdate) {
 
       for (const docScore of result.document_type_scores) {
         console.log(`\n📄 Processing Document Type: ${docScore.document_type.toUpperCase()}`);
-        console.log('-'.repeat(60));
+        console.log('-'.repeat(80));
 
         const docAccuracy = docScore.accuracy_score;
-        console.log(`  ✓ Accuracy: ${docAccuracy.toFixed(2)}%`);
-        console.log(`  ✓ Median Time: ${docScore.median_time.toFixed(2)}s`);
-
+        const docType = docScore.document_type;
+        const weight = accuracyWeights[docType] || 0;
+        const maxAccuracy = maxAccuraciesByDocType[docType];
         const THRESHOLD = 80;
-        console.log(`  Checking threshold: ${docAccuracy.toFixed(2)}% >= ${THRESHOLD}%?`);
 
-        const minTime = minMedianTimes[docScore.document_type];
-        const weight = accuracyWeights[docScore.document_type] || 0;
+        console.log(`  ✓ Accuracy: ${docAccuracy.toFixed(2)}%`);
+        console.log(`  ✓ Max Accuracy (across all vendors): ${maxAccuracy.toFixed(2)}%`);
+        console.log(`  ✓ Median Time: ${docScore.median_time.toFixed(2)}s`);
+        console.log(`  ✓ Weight: ${weight}`);
+        console.log(`  ✓ Threshold: ${THRESHOLD}%`);
 
         let weightedPoints = 0;
         let timeScore = 0;
 
         if (docAccuracy < THRESHOLD) {
           console.log(`  ❌ BELOW THRESHOLD: ${docAccuracy.toFixed(2)}% < ${THRESHOLD}%`);
-          console.log(`     → Weighted Points = 0`);
+          console.log(`     → Weighted Points = 0 (no points below threshold)`);
           console.log(`     → Time Score = 0 (no time awarded below threshold)`);
           weightedPoints = 0;
           timeScore = 0;
         } else {
           console.log(`  ✅ ABOVE THRESHOLD: ${docAccuracy.toFixed(2)}% >= ${THRESHOLD}%`);
 
-          // Quadratic formula: W × ((A - T) / (E - T))²
-          // W = weight, A = accuracy, T = threshold (80), E = max accuracy found
-          const maxAccuracy = 100; // Maximum possible accuracy
-          const quadraticScore = Math.pow((docAccuracy - THRESHOLD) / (maxAccuracy - THRESHOLD), 2);
-          weightedPoints = weight * quadraticScore;
+          // Calculate weighted score using the correct formula with max accuracy
+          weightedPoints = calculateComponentScore(docAccuracy, weight, maxAccuracy, THRESHOLD);
 
-          console.log(`     Formula: ${weight} × ((${docAccuracy.toFixed(2)} - ${THRESHOLD}) / (${maxAccuracy} - ${THRESHOLD}))²`);
-          console.log(`     = ${weight} × (${(docAccuracy - THRESHOLD).toFixed(2)} / ${(maxAccuracy - THRESHOLD)})²`);
-          console.log(`     = ${weight} × ${quadraticScore.toFixed(6)}²`);
+          console.log(`     Formula: ${weight} × ((${docAccuracy.toFixed(2)} - ${THRESHOLD}) / (${maxAccuracy.toFixed(2)} - ${THRESHOLD}))²`);
+          console.log(`     = ${weight} × (${(docAccuracy - THRESHOLD).toFixed(2)} / ${(maxAccuracy - THRESHOLD).toFixed(2)})²`);
+          console.log(`     = ${weight} × ${Math.pow((docAccuracy - THRESHOLD) / (maxAccuracy - THRESHOLD), 2).toFixed(6)}`);
           console.log(`     → Weighted Points = ${weightedPoints.toFixed(2)}`);
 
-          // Calculate time score (cubic formula)
+          // Calculate time score (cubic formula) - only if above threshold
+          const minTime = minMedianTimes[docType];
           if (minTime && minTime > 0 && docScore.median_time > 0) {
             timeScore = 30 * Math.pow(minTime / docScore.median_time, 3);
             console.log(`     Time Score: 30 × (${minTime.toFixed(2)}/${docScore.median_time.toFixed(2)})³ = ${timeScore.toFixed(2)}`);
@@ -945,26 +1224,29 @@ async function recalculateRankings(vendorNameToUpdate) {
         documentTypesCount++;
       }
 
-      // Average time score across all document types, then scale to 30 points
+      // Average time score across all document types
       const avgTimeScore = documentTypesCount > 0 ? totalTimeScore / documentTypesCount : 0;
 
-      // Calculate automated score (accuracy + time) out of 80 points
+      // Calculate automated score (accuracy + time)
       const automatedScore = weightedAccuracyScore + avgTimeScore;
 
-      // Total score = automated (80 max) + subjective (20 max) = 100 max
+      // Total score = automated + subjective (20 max) = 100 max
       const totalScore = automatedScore + (result.subjective_score || 0);
 
-      console.log(`\n${'='.repeat(60)}`);
+      console.log(`\n${'='.repeat(80)}`);
       console.log(`📈 FINAL CALCULATION FOR ${result.vendor_name}`);
-      console.log(`${'='.repeat(60)}`);
+      console.log(`${'='.repeat(80)}`);
+      console.log(`Total Weighted Accuracy Score: ${weightedAccuracyScore.toFixed(2)}`);
       console.log(`Total Time Score (before average): ${totalTimeScore.toFixed(2)}`);
       console.log(`Average Time Score (÷ ${documentTypesCount}): ${avgTimeScore.toFixed(2)}`);
-      console.log(`Total Weighted Accuracy Score: ${weightedAccuracyScore.toFixed(2)}`);
       console.log(`\n🎯 FINAL SCORES:`);
-      console.log(`  Automated Score: ${automatedScore.toFixed(2)} (Accuracy: ${weightedAccuracyScore.toFixed(2)} + Time: ${avgTimeScore.toFixed(2)})`);
+      console.log(`  Accuracy Score: ${weightedAccuracyScore.toFixed(2)}`);
+      console.log(`  Time Score: ${avgTimeScore.toFixed(2)}`);
+      console.log(`  Automated Score: ${automatedScore.toFixed(2)}`);
       console.log(`  Subjective Score: ${result.subjective_score || 0}`);
+      console.log(`  ════════════════════════`);
       console.log(`  TOTAL SCORE: ${totalScore.toFixed(2)}`);
-      console.log(`${'='.repeat(60)}\n`);
+      console.log(`${'='.repeat(80)}\n`);
 
       result.overall_accuracy = parseFloat(weightedAccuracyScore.toFixed(2));
       result.overall_time_score = parseFloat(avgTimeScore.toFixed(2));

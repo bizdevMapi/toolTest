@@ -11,6 +11,7 @@ const upload = multer({
 router.post('/upload', vendorController.uploadVendorSubmission);
 router.post('/upload-zip', upload.single('zipFile'), vendorController.uploadVendorZip);
 router.get('/submissions', vendorController.getVendorSubmissions);
+router.get('/intermediate-tables', vendorController.getIntermediateTables);
 router.post('/calculate-final', vendorController.calculateFinalScores);
 router.get('/results', vendorController.getEvaluationResults);
 router.put('/subjective-score', vendorController.updateSubjectiveScore);

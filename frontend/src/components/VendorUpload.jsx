@@ -13,6 +13,12 @@ const VendorUpload = () => {
     tazar: null,
     mavat: null
   });
+  const [timeValues, setTimeValues] = useState({
+    permit: '',
+    garmushka: '',
+    tazar: '',
+    mavat: ''
+  });
   const [loading, setLoading] = useState(false);
   const [uploadProgress, setUploadProgress] = useState({});
   const [availableDocTypes, setAvailableDocTypes] = useState({
@@ -59,6 +65,14 @@ const VendorUpload = () => {
     }
   };
 
+  const handleTimeChange = (documentType, e) => {
+    const value = e.target.value;
+    // Allow only numbers
+    if (value === '' || /^\d+$/.test(value)) {
+      setTimeValues(prev => ({ ...prev, [documentType]: value }));
+    }
+  };
+
   const handleUploadAll = async () => {
     if (!vendorName.trim()) {
       toast.error('נא להזין שם מציע');
@@ -88,6 +102,9 @@ const VendorUpload = () => {
         formData.append('vendor_name', vendorName.trim());
         formData.append('zipFile', zipFiles[documentType]);
         formData.append('document_type', documentType);
+        if (timeValues[documentType]) {
+          formData.append('time_seconds', timeValues[documentType]);
+        }
 
         const response = await axios.post(`${API_BASE_URL}/vendor/upload-zip`, formData, {
           headers: {
@@ -125,6 +142,14 @@ const VendorUpload = () => {
         garmushka: null,
         tazar: null,
         mavat: null
+      });
+
+      // Clear time values
+      setTimeValues({
+        permit: '',
+        garmushka: '',
+        tazar: '',
+        mavat: ''
       });
 
       // Clear file inputs
@@ -228,7 +253,28 @@ const VendorUpload = () => {
         />
 
         {hasFile && (
-          <p className="text-xs text-gray-600 mt-2" dir="ltr">📦 {hasFile.name}</p>
+          <>
+            <p className="text-xs text-gray-600 mt-2" dir="ltr">📦 {hasFile.name}</p>
+
+            <div className="mt-3 p-3 bg-white border border-gray-200 rounded-md">
+              <label htmlFor={`time-input-${docType}`} className="block text-sm font-medium text-gray-700 mb-2">
+                זמן בהפעלה (שניות) <span className="text-red-500">*</span>
+              </label>
+              <input
+                id={`time-input-${docType}`}
+                type="number"
+                min="0"
+                step="1"
+                value={timeValues[docType]}
+                onChange={(e) => handleTimeChange(docType, e)}
+                disabled={loading}
+                placeholder="הכנס זמן בשניות"
+                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm"
+                dir="rtl"
+              />
+              <p className="text-xs text-gray-500 mt-1">זמן בהפעלה של הבדיקה</p>
+            </div>
+          </>
         )}
       </div>
     );
