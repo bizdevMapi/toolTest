@@ -29,6 +29,7 @@ export const vendorAPI = {
   getSubmissions: () => api.get('/vendor/submissions'),
   calculateFinal: () => api.post('/vendor/calculate-final'),
   getResults: () => api.get('/vendor/results'),
+  getIntermediateTables: () => api.get('/vendor/intermediate-tables'),
   deleteAll: () => api.delete('/vendor/all'),
 };
 

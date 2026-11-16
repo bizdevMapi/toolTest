@@ -48,16 +48,25 @@ function calculateComponentScore(accuracy, weight, maxAccuracy, threshold = 80) 
  * Calculate time score for a vendor
  *
  * Scoring rules:
- * - 5 points: time ≤ minTime + S, where S = MAX(minTime * 10%, 5 seconds)
- * - 4 points: time ≤ 1.25*T + S
- * - 3 points: time ≤ 1.5*T + S
- * - 1 point: time > 1.5*T + S
+ * - Only score time if accuracy >= 80%
+ * - If accuracy < 80%, return 0 (no time score)
+ * - Otherwise:
+ *   - 5 points: time ≤ minTime + S, where S = MAX(minTime * 10%, 5 seconds)
+ *   - 4 points: time ≤ 1.25*T + S
+ *   - 3 points: time ≤ 1.5*T + S
+ *   - 1 point: time > 1.5*T + S
  *
  * @param {number} vendorTime - Vendor's time in seconds
  * @param {number} minTime - Minimum time across all vendors for this doc type
- * @returns {number} Time score (1-5 points) or 0 if no time data
+ * @param {number} accuracy - Vendor's accuracy score (0-100)
+ * @returns {number} Time score (1-5 points) or 0 if no time data or accuracy < 80%
  */
-function calculateTimeScore(vendorTime, minTime) {
+function calculateTimeScore(vendorTime, minTime, accuracy = 100) {
+  // If accuracy is below 80%, no time score
+  if (accuracy < 80) {
+    return 0;
+  }
+
   // If vendor time is 0 or missing, they didn't submit - no time score
   if (!vendorTime || vendorTime === 0 || !minTime || minTime === 0) {
     return 0;
@@ -518,8 +527,8 @@ exports.getIntermediateTables = async (req, res) => {
         // Calculate weighted accuracy score using quadratic formula
         const weightedScore = calculateComponentScore(accuracy, weight, maxAccuracy);
 
-        // Calculate time score
-        const timeScore = calculateTimeScore(time, minTime);
+        // Calculate time score (only if accuracy >= 80%)
+        const timeScore = calculateTimeScore(time, minTime, accuracy);
 
         // Add to intermediate table
         const tableRow = {

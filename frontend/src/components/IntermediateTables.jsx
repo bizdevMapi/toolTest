@@ -1,57 +1,9 @@
-import React, { useState, useEffect } from 'react';
-import axios from 'axios';
-import { toast } from 'react-toastify';
-
-const API_BASE_URL = 'http://localhost:5000/api';
+import React from 'react';
+import { documentTypeConfig, getColorClasses, getHeaderClasses, getAccuracyColorClass } from '../constants/documentTypes';
+import { useIntermediateTables } from '../hooks/useIntermediateTables';
 
 const IntermediateTables = () => {
-  const [tables, setTables] = useState(null);
-  const [loading, setLoading] = useState(false);
-
-  const documentTypeConfig = {
-    permit: { title: 'היתר בנייה מילולי', color: 'blue', weight: 5 },
-    garmushka: { title: 'גרמושקה', color: 'green', weight: 5 },
-    tazar: { title: 'תצ"ר', color: 'purple', weight: 20 },
-    mavat: { title: 'מבא"ת', color: 'orange', weight: 20 }
-  };
-
-  const loadTables = async () => {
-    setLoading(true);
-    try {
-      const response = await axios.get(`${API_BASE_URL}/vendor/intermediate-tables`);
-      setTables(response.data.data);
-      toast.success('טבלאות ביניים נטענו בהצלחה');
-    } catch (error) {
-      console.error('Error loading intermediate tables:', error);
-      toast.error('שגיאה בטעינת הטבלאות');
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  useEffect(() => {
-    loadTables();
-  }, []);
-
-  const getColorClasses = (color) => {
-    const colorMap = {
-      blue: 'border-blue-300 bg-blue-50',
-      green: 'border-green-300 bg-green-50',
-      purple: 'border-purple-300 bg-purple-50',
-      orange: 'border-orange-300 bg-orange-50'
-    };
-    return colorMap[color] || 'border-blue-300 bg-blue-50';
-  };
-
-  const getHeaderClasses = (color) => {
-    const colorMap = {
-      blue: 'bg-blue-200',
-      green: 'bg-green-200',
-      purple: 'bg-purple-200',
-      orange: 'bg-orange-200'
-    };
-    return colorMap[color] || 'bg-blue-200';
-  };
+  const { tables, loading, loadTables } = useIntermediateTables();
 
   const renderTable = (docType, rows) => {
     const config = documentTypeConfig[docType];
@@ -79,11 +31,7 @@ const IntermediateTables = () => {
               </thead>
               <tbody>
                 {rows.map((row, idx) => {
-                  // Color code the accuracy score based on threshold
-                  let accuracyColor = 'text-gray-500'; // Below threshold
-                  if (row.accuracy_score >= 80) {
-                    accuracyColor = 'text-green-700 font-bold'; // Above threshold
-                  }
+                  const accuracyColor = getAccuracyColorClass(row.accuracy_score);
 
                   return (
                     <tr key={idx} className={idx % 2 === 0 ? 'bg-white' : 'bg-gray-50'}>

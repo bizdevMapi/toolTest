@@ -62,6 +62,26 @@ const ResultsTable = () => {
     bld_num: 'מספר בניין'
   };
 
+  // Calculate final score: sum of accuracy + time for all document types
+  const calculateFinalScore = (result) => {
+    if (!result.document_type_scores || result.document_type_scores.length === 0) {
+      return 0;
+    }
+
+    // Sum accuracy scores for all document types
+    const totalAccuracy = result.document_type_scores.reduce(
+      (sum, doc) => sum + doc.weighted_score, 0
+    );
+
+    // Sum time scores for all document types
+    const totalTime = result.document_type_scores.reduce(
+      (sum, doc) => sum + doc.time_score, 0
+    );
+
+    // Total final score
+    return totalAccuracy + totalTime;
+  };
+
   return (
     <div className="bg-white rounded-lg shadow-md p-6">
       <div className="flex justify-between items-center mb-6">
@@ -85,6 +105,74 @@ const ResultsTable = () => {
         </div>
       ) : (
         <>
+          {/* Summary Table */}
+          <div className="mb-8">
+            <h3 className="text-lg font-bold text-gray-800 mb-4 text-right">סיכום ציונים</h3>
+            <div className="overflow-x-auto">
+              <table className="w-full text-sm border-collapse">
+                <thead>
+                  <tr className="bg-gradient-to-r from-blue-50 to-indigo-50">
+                    <th className="border border-gray-300 px-4 py-3 text-right font-bold text-gray-700">דירוג</th>
+                    <th className="border border-gray-300 px-4 py-3 text-right font-bold text-gray-700">שם מציע</th>
+                    <th className="border border-gray-300 px-4 py-3 text-center font-bold text-gray-700">סכום דיוק</th>
+                    <th className="border border-gray-300 px-4 py-3 text-center font-bold text-gray-700">סכום זמן</th>
+                    <th className="border border-gray-300 px-4 py-3 text-center font-bold text-gray-700">סה"כ</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {results.map((result, idx) => {
+                    const totalAccuracy = result.document_type_scores?.reduce(
+                      (sum, doc) => sum + doc.weighted_score, 0
+                    ) || 0;
+                    const totalTime = result.document_type_scores?.reduce(
+                      (sum, doc) => sum + doc.time_score, 0
+                    ) || 0;
+                    const finalScore = calculateFinalScore(result);
+
+                    return (
+                      <tr
+                        key={result._id}
+                        className={`
+                          ${idx % 2 === 0 ? 'bg-white' : 'bg-gray-50'}
+                          ${result.rank === 1 ? 'bg-yellow-100 font-bold' : ''}
+                          hover:bg-blue-100 transition-colors
+                        `}
+                      >
+                        <td className="border border-gray-300 px-4 py-3 text-right">
+                          {result.rank === 1 ? (
+                            <span className="inline-flex items-center px-2 py-1 rounded-full text-sm font-bold bg-yellow-400 text-yellow-900">
+                              🏆 #{result.rank}
+                            </span>
+                          ) : (
+                            <span className="font-medium">#{result.rank}</span>
+                          )}
+                        </td>
+                        <td className="border border-gray-300 px-4 py-3 text-right font-semibold">
+                          {result.vendor_name}
+                        </td>
+                        <td className="border border-gray-300 px-4 py-3 text-center font-medium">
+                          <span className="inline-flex px-3 py-1 bg-blue-100 text-blue-800 rounded-full">
+                            {totalAccuracy.toFixed(2)}
+                          </span>
+                        </td>
+                        <td className="border border-gray-300 px-4 py-3 text-center font-medium">
+                          <span className="inline-flex px-3 py-1 bg-green-100 text-green-800 rounded-full">
+                            {totalTime.toFixed(2)}
+                          </span>
+                        </td>
+                        <td className="border border-gray-300 px-4 py-3 text-center font-bold">
+                          <span className="inline-flex px-3 py-1 bg-purple-100 text-purple-800 rounded-full text-base">
+                            {finalScore.toFixed(2)}
+                          </span>
+                        </td>
+                      </tr>
+                    );
+                  })}
+                </tbody>
+              </table>
+            </div>
+          </div>
+
           <div className="overflow-x-auto">
             <table className="w-full text-sm">
               <thead className="bg-gray-50">

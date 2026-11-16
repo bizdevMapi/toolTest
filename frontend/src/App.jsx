@@ -3,8 +3,8 @@ import { BrowserRouter as Router, Routes, Route, Link, useLocation } from 'react
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import VendorUpload from './components/VendorUpload';
-import ResultsTable from './components/ResultsTable';
 import IntermediateTables from './components/IntermediateTables';
+import FinalSummary from './components/FinalSummary';
 
 function Navigation() {
   const location = useLocation();
@@ -34,14 +34,14 @@ function Navigation() {
             📋 טבלאות ביניים
           </Link>
           <Link
-            to="/results"
+            to="/final-summary"
             className={`px-6 py-2 rounded-md font-semibold transition-colors ${
-              location.pathname === '/results'
+              location.pathname === '/final-summary'
                 ? 'bg-primary-600 text-white'
                 : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
             }`}
           >
-            📊 תוצאות הערכה
+            ✨ סיכום סופי
           </Link>
         </div>
       </div>
@@ -79,7 +79,7 @@ function App() {
           <Routes>
             <Route path="/" element={<VendorUpload />} />
             <Route path="/intermediate-tables" element={<IntermediateTables />} />
-            <Route path="/results" element={<ResultsTable />} />
+            <Route path="/final-summary" element={<FinalSummary />} />
           </Routes>
         </main>
 
