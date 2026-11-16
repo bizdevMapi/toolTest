@@ -19,6 +19,7 @@ const VendorUpload = () => {
   });
   const [loading, setLoading] = useState(false);
   const [uploadProgress, setUploadProgress] = useState({});
+  const [uploadComplete, setUploadComplete] = useState(false);
   const [availableDocTypes, setAvailableDocTypes] = useState({
     permit: true,
     garmushka: true,
@@ -125,10 +126,13 @@ const VendorUpload = () => {
     setLoading(false);
 
     // Final summary
-    if (successCount > 0) {
-      toast.success(`🎉 הועלו בהצלחה ${successCount} מתוך ${selectedFiles.length} סוגי מסמכים`, {
+    if (successCount > 0 && errorCount === 0) {
+      // כל המסמכים הועלו בהצלחה
+      toast.success(`🎉 כל המסמכים הועלו בהצלחה!`, {
         autoClose: 5000
       });
+
+      setUploadComplete(true);
 
       // Clear uploaded files
       setZipFiles({
@@ -153,7 +157,17 @@ const VendorUpload = () => {
       });
 
       setUploadProgress({});
+    } else if (successCount > 0 && errorCount > 0) {
+      // חלק מהקבצים נכשלו
+      toast.warning(`⚠️ הועלו ${successCount} מתוך ${selectedFiles.length} סוגי מסמכים`, {
+        autoClose: 5000
+      });
     }
+  };
+
+  const handleReset = () => {
+    setUploadComplete(false);
+    setVendorName('');
   };
 
   const documentTypeConfig = {
@@ -273,6 +287,27 @@ const VendorUpload = () => {
       </div>
     );
   };
+
+  // אם ההעלאה הסתיימה בהצלחה, הצג מסך הצלחה
+  if (uploadComplete) {
+    return (
+      <div className="bg-gradient-to-br from-green-50 to-emerald-50 rounded-lg shadow-md p-8 border-2 border-green-200">
+        <div className="text-center">
+          <div className="mb-4 text-6xl animate-bounce">✅</div>
+          <h2 className="text-3xl font-bold text-green-700 mb-3">כל המסמכים הועלו בהצלחה!</h2>
+          <p className="text-green-600 text-lg mb-2">המערכת קיבלה את כל הקבצים ומעבדת את התוצאות</p>
+          <p className="text-green-500 text-sm mb-8">אתה יכול לעבור לדף הבדיקות כדי לראות את התוצאות</p>
+
+          <button
+            onClick={handleReset}
+            className="bg-green-600 hover:bg-green-700 text-white font-bold py-3 px-8 rounded-lg transition-all transform hover:scale-[1.05] shadow-lg"
+          >
+            🔄 העלה מציע חדש
+          </button>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="bg-white rounded-lg shadow-md p-6">
