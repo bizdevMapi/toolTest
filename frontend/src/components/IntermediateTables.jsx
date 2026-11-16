@@ -3,7 +3,7 @@ import { documentTypeConfig, getColorClasses, getHeaderClasses, getAccuracyColor
 import { useIntermediateTables } from '../hooks/useIntermediateTables';
 
 const IntermediateTables = () => {
-  const { tables, loading, loadTables } = useIntermediateTables();
+  const { tables, loading, hasData, loadTables } = useIntermediateTables();
 
   const renderTable = (docType, rows) => {
     const config = documentTypeConfig[docType];
@@ -84,15 +84,20 @@ const IntermediateTables = () => {
         הטבלאות מציגות את ציון הדיוק הממוצע וזמן הביצוע החציוני לכל ספק בכל סוג מסמך
       </p>
 
-      {tables ? (
+      {loading ? (
+        <div className="text-center py-8">
+          <p className="text-gray-500">⏳ טוען נתונים...</p>
+        </div>
+      ) : tables && hasData ? (
         <div>
           {Object.keys(documentTypeConfig).map(docType =>
             renderTable(docType, tables[docType])
           )}
         </div>
       ) : (
-        <div className="text-center py-8">
-          <p className="text-gray-500">טוען נתונים...</p>
+        <div className="text-center py-8 bg-blue-50 rounded-lg border border-blue-200 p-6">
+          <p className="text-blue-700 font-semibold">📋 עדיין לא הועלו נתונים</p>
+          <p className="text-blue-600 text-sm mt-2">כאשר יופעלו בדיקות על מסמכים, הנתונים יופיעו כאן</p>
         </div>
       )}
     </div>

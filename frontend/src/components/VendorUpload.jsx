@@ -58,7 +58,7 @@ const VendorUpload = () => {
       if (isZip) {
         setZipFiles(prev => ({ ...prev, [documentType]: selectedFile }));
       } else {
-        toast.error('נא לבחור קובץ ZIP תקין');
+        // toast.error('נא לבחור קובץ ZIP תקין');
         e.target.value = null;
       }
     }
@@ -74,7 +74,7 @@ const VendorUpload = () => {
 
   const handleUploadAll = async () => {
     if (!vendorName.trim()) {
-      toast.error('נא להזין שם מציע');
+      // toast.error('נא להזין שם מציע');
       return;
     }
 
@@ -82,8 +82,16 @@ const VendorUpload = () => {
     const selectedFiles = Object.keys(zipFiles).filter(docType => zipFiles[docType]);
 
     if (selectedFiles.length === 0) {
-      toast.error('נא לבחור לפחות קובץ ZIP אחד');
+      // toast.error('נא לבחור לפחות קובץ ZIP אחד');
       return;
+    }
+
+    // Check if all selected files have time values
+    for (const docType of selectedFiles) {
+      if (!timeValues[docType] || timeValues[docType].trim() === '') {
+        // toast.error(`נא להזין זמן עבור ${documentTypeConfig[docType].title}`);
+        return;
+      }
     }
 
     setLoading(true);
@@ -110,16 +118,16 @@ const VendorUpload = () => {
         setUploadProgress(prev => ({ ...prev, [documentType]: 'success' }));
         successCount++;
 
-        toast.success(`✅ ${documentTypeConfig[documentType].title}: ${response.data.files_processed} קבצים`, {
-          autoClose: 2000
-        });
+        // toast.success(`✅ ${documentTypeConfig[documentType].title}: ${response.data.files_processed} קבצים`, {
+        //   autoClose: 2000
+        // });
 
       } catch (error) {
         setUploadProgress(prev => ({ ...prev, [documentType]: 'error' }));
         errorCount++;
 
         const message = error.response?.data?.message || 'שגיאה';
-        toast.error(`❌ ${documentTypeConfig[documentType].title}: ${message}`);
+        // toast.error(`❌ ${documentTypeConfig[documentType].title}: ${message}`);
       }
     }
 
@@ -128,9 +136,9 @@ const VendorUpload = () => {
     // Final summary
     if (successCount > 0 && errorCount === 0) {
       // כל המסמכים הועלו בהצלחה
-      toast.success(`🎉 כל המסמכים הועלו בהצלחה!`, {
-        autoClose: 5000
-      });
+      // toast.success(`🎉 כל המסמכים הועלו בהצלחה!`, {
+      //   autoClose: 5000
+      // });
 
       setUploadComplete(true);
 
@@ -159,9 +167,9 @@ const VendorUpload = () => {
       setUploadProgress({});
     } else if (successCount > 0 && errorCount > 0) {
       // חלק מהקבצים נכשלו
-      toast.warning(`⚠️ הועלו ${successCount} מתוך ${selectedFiles.length} סוגי מסמכים`, {
-        autoClose: 5000
-      });
+      // toast.warning(`⚠️ הועלו ${successCount} מתוך ${selectedFiles.length} סוגי מסמכים`, {
+      //   autoClose: 5000
+      // });
     }
   };
 
@@ -277,9 +285,15 @@ const VendorUpload = () => {
                 onChange={(e) => handleTimeChange(docType, e)}
                 disabled={loading}
                 placeholder="הכנס זמן בשניות"
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm"
+                required
+                className={`w-full px-3 py-2 border rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm ${
+                  !timeValues[docType] ? 'border-red-300 bg-red-50' : 'border-gray-300'
+                }`}
                 dir="rtl"
               />
+              {!timeValues[docType] && (
+                <p className="text-xs text-red-600 mt-1">⚠️ שדה זה חובה</p>
+              )}
               <p className="text-xs text-gray-500 mt-1">זמן בהפעלה של הבדיקה</p>
             </div>
           </>

@@ -445,10 +445,18 @@ exports.getIntermediateTables = async (req, res) => {
     console.log(`Total evaluation results found: ${results.length}`);
 
     if (results.length === 0) {
-      console.log(`❌ No evaluation results found in DB`);
-      return res.status(400).json({
-        success: false,
-        message: 'No evaluation results found'
+      console.log(`⚠️ No evaluation results found in DB - returning empty data`);
+      // Return empty intermediate tables instead of error
+      // This is not an error state, just no data available yet
+      return res.status(200).json({
+        success: true,
+        message: 'No evaluation results found yet',
+        data: {
+          permit: [],
+          garmushka: [],
+          tazar: [],
+          mavat: []
+        }
       });
     }
 
