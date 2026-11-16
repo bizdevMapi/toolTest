@@ -26,6 +26,9 @@ export const groundTruthAPI = {
 
 export const vendorAPI = {
   upload: (data) => api.post('/vendor/upload', data),
+  uploadZip: (formData) => api.post('/vendor/upload-zip', formData, {
+    headers: { 'Content-Type': 'multipart/form-data' },
+  }),
   getSubmissions: () => api.get('/vendor/submissions'),
   calculateFinal: () => api.post('/vendor/calculate-final'),
   getResults: () => api.get('/vendor/results'),

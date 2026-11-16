@@ -1,9 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import axios from 'axios';
 import { toast } from 'react-toastify';
-import { groundTruthAPI } from '../services/api';
-
-const API_BASE_URL = 'http://localhost:5000/api';
+import { groundTruthAPI, vendorAPI } from '../services/api';
+import { documentTypeConfig } from '../constants/documentTypes';
 
 const VendorUpload = () => {
   const [vendorName, setVendorName] = useState('');
@@ -106,11 +104,7 @@ const VendorUpload = () => {
           formData.append('time_seconds', timeValues[documentType]);
         }
 
-        const response = await axios.post(`${API_BASE_URL}/vendor/upload-zip`, formData, {
-          headers: {
-            'Content-Type': 'multipart/form-data',
-          },
-        });
+        const response = await vendorAPI.uploadZip(formData);
 
         setUploadProgress(prev => ({ ...prev, [documentType]: 'success' }));
         successCount++;
