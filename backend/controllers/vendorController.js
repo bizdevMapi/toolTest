@@ -46,31 +46,39 @@ function calculateComponentScore(accuracy, weight, maxAccuracy, threshold = 80) 
 
 /**
  * Calculate time score for a vendor
- * ציון זמן = MAX(0, 5 - FLOOR((זמן_ספק - זמן_מינימלי) / 4))
+ *
+ * Scoring rules:
+ * - 5 points: time ≤ minTime + S, where S = MAX(minTime * 10%, 5 seconds)
+ * - 4 points: time ≤ 1.25*T + S
+ * - 3 points: time ≤ 1.5*T + S
+ * - 1 point: time > 1.5*T + S
  *
  * @param {number} vendorTime - Vendor's time in seconds
  * @param {number} minTime - Minimum time across all vendors for this doc type
- * @returns {number} Time score (0-5 points) or 0 if no time data
+ * @returns {number} Time score (1-5 points) or 0 if no time data
  */
 function calculateTimeScore(vendorTime, minTime) {
-  const MAX_TIME_POINTS = 5;
-  const TIME_INCREMENT = 4; // Each 4 seconds loses 1 point
-
   // If vendor time is 0 or missing, they didn't submit - no time score
   if (!vendorTime || vendorTime === 0 || !minTime || minTime === 0) {
     return 0;
   }
 
-  // Time difference from minimum
-  const timeDiff = vendorTime - minTime;
+  const T = minTime;
+  // S = MAX(10% of minTime, 5 seconds)
+  const S = Math.max(T * 0.10, 5);
 
-  // Calculate points lost
-  const pointsLost = Math.floor(timeDiff / TIME_INCREMENT);
+  // Check thresholds and return appropriate score
+  if (vendorTime <= T + S) {
+    return 5;  // Within tolerance
+  }
+  if (vendorTime <= 1.25 * T + S) {
+    return 4;
+  }
+  if (vendorTime <= 1.5 * T + S) {
+    return 3;
+  }
 
-  // Final score (minimum 0)
-  const timeScore = Math.max(0, MAX_TIME_POINTS - pointsLost);
-
-  return timeScore;
+  return 1;  // Over 1.5*T + S
 }
 
 /**
@@ -255,13 +263,8 @@ exports.calculateFinalScores = async (req, res) => {
           s => s.vendor_name === vendor && s.document_type === docType
         );
 
-        const uniqueFiles = [...new Set(vendorDocs.map(s => s.file_name))];
-        const fileTimes = uniqueFiles.map(fileName => {
-          const fileSubmissions = vendorDocs.filter(s => s.file_name === fileName);
-          return fileSubmissions.length > 0 ? fileSubmissions[0].total_time_seconds : 0;
-        });
-
-        const medianTime = calculateMedian(fileTimes);
+        // Get time for this document type (all submissions for this vendor+docType have same time)
+        const medianTime = vendorDocs.length > 0 ? vendorDocs[0].total_time_seconds : 0;
         if (medianTime > 0) {
           vendorMedians.push(medianTime);
         }
@@ -300,17 +303,10 @@ exports.calculateFinalScores = async (req, res) => {
 
         console.log(`  ✓ Raw Accuracy Score: ${docAccuracy} (${(docAccuracy * 100).toFixed(2)}%)`);
 
-        const uniqueFiles = [...new Set(docSubs.map(s => s.file_name))];
-        console.log(`  Files processed: ${uniqueFiles.length}`);
-
-        const fileTimes = uniqueFiles.map(fileName => {
-          const fileSubmissions = docSubs.filter(s => s.file_name === fileName);
-          return fileSubmissions.length > 0 ? fileSubmissions[0].total_time_seconds : 0;
-        });
-
-        const medianTime = fileTimes.length > 0 ? calculateMedian(fileTimes) : 0;
+        // Get time for this document type (all submissions have same time per docType)
+        const medianTime = docSubs.length > 0 ? docSubs[0].total_time_seconds : 0;
         console.log(`  ✓ Median Time: ${medianTime.toFixed(2)}s`);
-        console.log(`  File times: [${fileTimes.map(t => t.toFixed(2)).join(', ')}]`);
+        console.log(`  Submissions received: ${docSubs.length}`);
 
         const tMin = minMedianTimes[docType];
         console.log(`  Minimum median time (tMin): ${tMin ? tMin.toFixed(2) : 'N/A'}s`);
@@ -514,7 +510,7 @@ exports.getIntermediateTables = async (req, res) => {
       for (const docScore of result.document_type_scores) {
         const docType = docScore.document_type;
         const accuracy = docScore.accuracy_score;
-        const medianTime = docScore.median_time;
+        const time = docScore.median_time;
         const weight = accuracyWeights[docType];
         const maxAccuracy = maxAccuraciesByDocType[docType];
         const minTime = minTimesByDocType[docType];
@@ -523,21 +519,21 @@ exports.getIntermediateTables = async (req, res) => {
         const weightedScore = calculateComponentScore(accuracy, weight, maxAccuracy);
 
         // Calculate time score
-        const timeScore = calculateTimeScore(medianTime, minTime);
+        const timeScore = calculateTimeScore(time, minTime);
 
         // Add to intermediate table
         const tableRow = {
           vendor_name: result.vendor_name,
           accuracy_score: parseFloat(accuracy.toFixed(2)),
           weighted_score: parseFloat(weightedScore.toFixed(2)),
-          median_time: medianTime,
+          median_time: time,
           min_time: minTime,
           time_score: parseFloat(timeScore.toFixed(2)),
           weight: weight,
           threshold: 80
         };
 
-        console.log(`   ├─ ${docType.toUpperCase()}: accuracy=${accuracy.toFixed(2)}% (→${weightedScore.toFixed(2)}) | time=${medianTime}s (→${timeScore.toFixed(2)})`);
+        console.log(`   ├─ ${docType.toUpperCase()}: accuracy=${accuracy.toFixed(2)}% (→${weightedScore.toFixed(2)}) | time=${time}s (→${timeScore.toFixed(2)})`);
         intermediateData[docType].push(tableRow);
       }
     }
