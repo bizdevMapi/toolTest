@@ -5,6 +5,7 @@ import 'react-toastify/dist/ReactToastify.css';
 import VendorUpload from './components/VendorUpload';
 import IntermediateTables from './components/IntermediateTables';
 import FinalSummary from './components/FinalSummary';
+import ScoreBreakdownPage from './components/ScoreBreakdownPage';
 
 function Navigation() {
   const location = useLocation();
@@ -43,6 +44,16 @@ function Navigation() {
           >
             ✨ סיכום סופי
           </Link>
+          <Link
+            to="/score-breakdown"
+            className={`px-6 py-2 rounded-md font-semibold transition-colors ${
+              location.pathname === '/score-breakdown'
+                ? 'bg-primary-600 text-white'
+                : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+            }`}
+          >
+            📊 ניתוח מפורט
+          </Link>
         </div>
       </div>
     </nav>
@@ -80,6 +91,7 @@ function App() {
             <Route path="/" element={<VendorUpload />} />
             <Route path="/intermediate-tables" element={<IntermediateTables />} />
             <Route path="/final-summary" element={<FinalSummary />} />
+            <Route path="/score-breakdown" element={<ScoreBreakdownPage />} />
           </Routes>
         </main>
 

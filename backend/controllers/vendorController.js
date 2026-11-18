@@ -624,6 +624,107 @@ exports.getIntermediateTables = async (req, res) => {
 };
 
 /**
+ * Get detailed submission history for a specific vendor
+ * GET /api/vendor/:vendor_name/submission-history
+ *
+ * Returns all individual submissions grouped by document type
+ */
+exports.getVendorSubmissionHistory = async (req, res) => {
+  try {
+    const { vendor_name } = req.params;
+
+    if (!vendor_name || !vendor_name.trim()) {
+      return res.status(400).json({
+        success: false,
+        message: 'Vendor name is required'
+      });
+    }
+
+    const submissions = await VendorSubmission.find({
+      vendor_name: vendor_name.trim()
+    }).sort({ document_type: 1, file_name: 1, field_name: 1 });
+
+    if (submissions.length === 0) {
+      return res.status(404).json({
+        success: true,
+        message: 'No submissions found for this vendor',
+        data: []
+      });
+    }
+
+    // Group submissions by document type
+    const groupedByDocType = {};
+    const documentTypes = ['permit', 'garmushka', 'tazar', 'mavat'];
+
+    for (const docType of documentTypes) {
+      groupedByDocType[docType] = {
+        document_type: docType,
+        submissions: [],
+        stats: {
+          total_fields: 0,
+          correct_fields: 0,
+          accuracy_percentage: 0,
+          median_time: 0
+        }
+      };
+    }
+
+    // Group by document type
+    for (const submission of submissions) {
+      const docType = submission.document_type;
+      if (groupedByDocType[docType]) {
+        groupedByDocType[docType].submissions.push({
+          file_name: submission.file_name,
+          field_name: submission.field_name,
+          extracted_value: submission.extracted_value,
+          normalized_value: submission.normalized_value,
+          ground_truth_value: submission.ground_truth_value || submission.extracted_value,
+          accuracy_score: submission.accuracy_score,
+          is_correct: submission.accuracy_score === 1,
+          total_time_seconds: submission.total_time_seconds,
+          uploaded_at: submission.createdAt
+        });
+      }
+    }
+
+    // Calculate stats for each document type
+    for (const docType of documentTypes) {
+      const data = groupedByDocType[docType];
+      const subs = data.submissions;
+
+      if (subs.length > 0) {
+        data.stats.total_fields = subs.length;
+        data.stats.correct_fields = subs.filter(s => s.is_correct).length;
+        data.stats.accuracy_percentage = parseFloat(
+          ((data.stats.correct_fields / subs.length) * 100).toFixed(2)
+        );
+
+        // Get median time
+        const times = subs.map(s => s.total_time_seconds).filter(t => t > 0);
+        if (times.length > 0) {
+          times.sort((a, b) => a - b);
+          data.stats.median_time = times[Math.floor(times.length / 2)];
+        }
+      }
+    }
+
+    res.status(200).json({
+      success: true,
+      vendor_name: vendor_name.trim(),
+      data: groupedByDocType
+    });
+
+  } catch (error) {
+    console.error('Error fetching vendor submission history:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Error fetching vendor submission history',
+      error: error.message
+    });
+  }
+};
+
+/**
  * Delete all vendor submissions and results
  * DELETE /api/vendor/all
  */
@@ -955,6 +1056,71 @@ exports.uploadVendorZip = async (req, res) => {
         success: false,
         message: 'No valid permit submissions found in ZIP files'
       });
+    }
+
+    // SAVE ALL SUBMISSIONS TO VendorSubmission collection
+    const submissionsToSave = [];
+
+    for (const file of jsonFiles) {
+      try {
+        const fileContent = file.getData().toString('utf8');
+        const jsonData = JSON.parse(fileContent);
+        const submissions = Array.isArray(jsonData) ? jsonData : [jsonData];
+
+        for (const submission of submissions) {
+          if (submission.fields && Array.isArray(submission.fields)) {
+            if (submission.document_type !== documentType) continue;
+
+            for (const field of submission.fields) {
+              if (!field.field_name || field.extracted_value === undefined) continue;
+
+              const fieldName = field.field_name.trim();
+              const key = `${submission.file_name.trim()}|${submission.document_type.trim()}|${fieldName}`;
+              const expectedValue = groundTruthMap[key];
+
+              // Use the normalized_value provided by the vendor
+              const vendorNormalizedValue = field.normalized_value || String(field.extracted_value);
+
+              // Calculate accuracy
+              const accuracyScore = calculateAccuracy(
+                fieldName,
+                expectedValue || '',
+                vendorNormalizedValue
+              );
+
+              // Get time for this submission
+              const fileTimeSeconds = submission.total_time_seconds || 0;
+              const usedTimeSeconds = timeSeconds !== null ? timeSeconds : fileTimeSeconds;
+
+              submissionsToSave.push({
+                vendor_name: vendorNameTrimmed,
+                file_name: submission.file_name.trim(),
+                document_type: submission.document_type.trim(),
+                field_name: fieldName,
+                extracted_value: String(field.extracted_value),
+                normalized_value: vendorNormalizedValue,
+                accuracy_score: accuracyScore,
+                total_time_seconds: usedTimeSeconds,
+                ground_truth_value: expectedValue || '',
+                upload_timestamp: new Date()
+              });
+            }
+          }
+        }
+      } catch (parseError) {
+        console.error(`Error parsing for DB save ${file.entryName}:`, parseError);
+        continue;
+      }
+    }
+
+    // Delete old submissions for this vendor and document type, then save new ones
+    if (submissionsToSave.length > 0) {
+      await VendorSubmission.deleteMany({
+        vendor_name: vendorNameTrimmed,
+        document_type: documentType
+      });
+      await VendorSubmission.insertMany(submissionsToSave);
+      console.log(`✅ Saved ${submissionsToSave.length} submissions to VendorSubmission collection`);
     }
 
     // Calculate average per field, then average of averages

@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { vendorAPI } from '../services/api';
 import { toast } from 'react-toastify';
+import ScoreBreakdown from './ScoreBreakdown';
 
 const ResultsTable = () => {
   const [results, setResults] = useState([]);
@@ -259,6 +260,20 @@ const ResultsTable = () => {
                 ))}
               </tbody>
             </table>
+          </div>
+
+          {/* Score Breakdown Cards */}
+          <div className="mt-8">
+            <h3 className="text-lg font-bold text-gray-800 mb-4 text-right">📊 ניתוח מפורט של הניקוד</h3>
+            <div className="space-y-4">
+              {results.map((result) => (
+                <ScoreBreakdown
+                  key={result._id}
+                  vendorName={result.vendor_name}
+                  result={result}
+                />
+              ))}
+            </div>
           </div>
 
           {results.length > 0 && results[0].rank === 1 && (

@@ -30,6 +30,7 @@ export const vendorAPI = {
     headers: { 'Content-Type': 'multipart/form-data' },
   }),
   getSubmissions: () => api.get('/vendor/submissions'),
+  getVendorSubmissionHistory: (vendorName) => api.get(`/vendor/${vendorName}/submission-history`),
   calculateFinal: () => api.post('/vendor/calculate-final'),
   getResults: () => api.get('/vendor/results'),
   getIntermediateTables: () => api.get('/vendor/intermediate-tables'),
